@@ -42,6 +42,9 @@ pub struct Shared {
     pub position: AtomicU64,
     pub stop: AtomicBool,
     pub frames: AtomicU64,
+    /// Live video: how far (ms) the newest picture is behind the camera's own clock, measured from the
+    /// first picture. Grows steadily when decoding can't keep up.
+    pub lag_ms: AtomicU64,
     record_to: Mutex<Option<PathBuf>>,
     pub recording: AtomicBool,
     snapshot_to: Mutex<Option<PathBuf>>,
@@ -312,6 +315,7 @@ async fn run(ctx: &egui::Context, shared: &Shared, url: &str, user: &str, pass: 
     let mut fps_count = 0u32;
     let mut fps_since = Instant::now();
     let mut size: (usize, usize);
+    let mut clock0: Option<(Instant, f64)> = None; // (wall, media seconds) of the first picture
 
     loop {
         if shared.stop.load(Ordering::Relaxed) {
@@ -403,6 +407,9 @@ async fn run(ctx: &egui::Context, shared: &Shared, url: &str, user: &str, pass: 
                     });
                 }
                 size = (w, h);
+                let (t0, ts0) = *clock0.get_or_insert((Instant::now(), ts));
+                let lag = t0.elapsed().as_secs_f64() - (ts - ts0);
+                shared.lag_ms.store((lag.max(0.0) * 1000.0) as u64, Ordering::Relaxed);
                 *shared.picture.lock().unwrap() = Some(Picture { w, h, rgba });
                 shared.frames.fetch_add(1, Ordering::Relaxed);
                 if shared.state() == State::Connecting {
@@ -589,6 +596,42 @@ mod pause_tests {
         println!("after the screen stopped: {state:?}, pictures {a} -> {b}");
         assert_eq!(state, State::Paused);
         assert_eq!(a, b, "still decoding while paused");
+    }
+}
+
+#[cfg(test)]
+mod soak_tests {
+    use super::*;
+
+    /// Real camera, many minutes: plays a saved device's channel without a window and prints, every
+    /// 10 s, pictures per second and how far the picture is behind the camera. Settings:
+    /// MYCCTV_SOAK_DEVICE (1-based, default 1), MYCCTV_SOAK_CHANNEL (1-based, default 1),
+    /// MYCCTV_SOAK_STREAM (0 main, 1 sub; default 0), MYCCTV_SOAK_SECS (default 120).
+    /// `cargo test --release soak_live -- --ignored --nocapture`
+    #[test]
+    #[ignore]
+    fn soak_live() {
+        let env = |k: &str, d: u64| std::env::var(k).ok().and_then(|v| v.parse().ok()).unwrap_or(d);
+        let (dev, ch, st, secs) = (env("MYCCTV_SOAK_DEVICE", 1) as usize, env("MYCCTV_SOAK_CHANNEL", 1) as u32, env("MYCCTV_SOAK_STREAM", 0) as u8, env("MYCCTV_SOAK_SECS", 120));
+        let store = crate::model::Store::load();
+        let d = store.devices.get(dev - 1).expect("device").clone();
+        let h = start_routes(egui::Context::default(), d.live_routes(ch - 1, st, &store.devices), false);
+        let t = Instant::now();
+        let mut last = 0;
+        while t.elapsed() < Duration::from_secs(secs) {
+            std::thread::sleep(Duration::from_secs(10));
+            let f = h.shared.frames.load(Ordering::Relaxed);
+            println!(
+                "{:>4}s {:?} {:>5.1} fps  behind {:>6} ms  {}",
+                t.elapsed().as_secs(),
+                h.shared.state(),
+                (f - last) as f32 / 10.0,
+                h.shared.lag_ms.load(Ordering::Relaxed),
+                h.shared.info.lock().unwrap()
+            );
+            last = f;
+        }
+        assert!(last > 0, "no video: {:?}", h.shared.state());
     }
 }
 
