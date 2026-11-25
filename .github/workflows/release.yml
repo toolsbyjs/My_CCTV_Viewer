@@ -120,7 +120,7 @@ jobs:
   macos:
     name: macOS universal
     needs: version
-    runs-on: macos-14
+    runs-on: macos-latest
     # The Mac app is not tested on a real Mac yet: a failure here doesn't hold back the release.
     continue-on-error: true
     steps:

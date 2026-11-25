@@ -32,7 +32,7 @@ through glow). There is no C++ or Java code of our own; native pieces come from 
 
 The **Release** workflow (`.github/workflows/release.yml`) then builds on GitHub's machines:
 `MyCCTV-<version>-windows-x64.exe` (Windows, after the unit tests), `MyCCTV-<version>-android-googletv.apk`
-(Linux, NDK 27, cargo-apk) and `MyCCTV-<version>-macos-universal.dmg` (macOS 14; allowed to fail while the Mac
+(Linux, NDK 27, cargo-apk) and `MyCCTV-<version>-macos-universal.dmg` (macOS, newest runner; allowed to fail while the Mac
 build is untested), and publishes a GitHub Release with those files, `SHA256SUMS.txt` and the changelog section.
 The tag must match the `Cargo.toml` version. "Run workflow" on the Actions tab builds everything without
 publishing (files are kept as run artifacts).
