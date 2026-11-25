@@ -105,6 +105,8 @@ struct PlayWindow {
     scale: Scale,
     handle: Option<StreamHandle>,
     tex: Option<TextureHandle>,
+    /// The picture last given to the screen; its memory goes back to the video thread for reuse.
+    shown: Option<Arc<egui::ColorImage>>,
     shown_frames: u64,
     started: Option<Instant>,
     burst: Option<(u32, Instant)>,
@@ -115,7 +117,7 @@ struct PlayWindow {
 
 impl PlayWindow {
     fn new() -> Self {
-        Self { source: None, mode: WinMode::Live, stream_override: None, scale: Scale::Full, handle: None, tex: None, shown_frames: 0, started: None, burst: None, zoom: 1.0, center: [0.5, 0.5] }
+        Self { source: None, mode: WinMode::Live, stream_override: None, scale: Scale::Full, handle: None, tex: None, shown: None, shown_frames: 0, started: None, burst: None, zoom: 1.0, center: [0.5, 0.5] }
     }
     fn clear(&mut self) {
         *self = Self { scale: self.scale, ..Self::new() };
@@ -778,11 +780,27 @@ impl KvmsApp {
             if f != w.shown_frames {
                 w.shown_frames = f;
                 if let Some(pic) = h.shared.picture.lock().unwrap().take() {
-                    let img = egui::ColorImage::from_rgba_unmultiplied([pic.w, pic.h], &pic.rgba);
-                    match &mut w.tex {
-                        Some(t) => t.set(img, TextureOptions::LINEAR),
-                        None => w.tex = Some(ctx.load_texture(format!("video{i}"), img, TextureOptions::LINEAR)),
+                    // No new memory per picture: the previous picture's buffer (uploaded by now) goes
+                    // back to the video thread, and this one is handed over as it is, not copied.
+                    if let Some(prev) = w.shown.take() {
+                        if let Ok(img) = Arc::try_unwrap(prev) {
+                            if let Ok(bytes) = bytemuck::allocation::try_cast_vec::<Color32, u8>(img.pixels) {
+                                h.shared.recycle(bytes);
+                            }
+                        }
                     }
+                    let size = [pic.w, pic.h];
+                    // The pictures are opaque, so straight and premultiplied colors are the same bytes.
+                    let pixels = bytemuck::allocation::try_cast_vec::<u8, Color32>(pic.rgba)
+                        .unwrap_or_else(|(_, v)| v.chunks_exact(4).map(|c| Color32::from_rgba_unmultiplied(c[0], c[1], c[2], c[3])).collect());
+                    let img = Arc::new(egui::ColorImage { size, pixels });
+                    match &mut w.tex {
+                        // Same size: update the picture in place on the graphics card.
+                        Some(t) if t.size() == size => t.set_partial([0, 0], img.clone(), TextureOptions::LINEAR),
+                        Some(t) => t.set(img.clone(), TextureOptions::LINEAR),
+                        None => w.tex = Some(ctx.load_texture(format!("video{i}"), img.clone(), TextureOptions::LINEAR)),
+                    }
+                    w.shown = Some(img);
                 }
             }
             if let Some(n) = h.shared.notice.lock().unwrap().take() {

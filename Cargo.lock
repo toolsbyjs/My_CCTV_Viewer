@@ -1579,6 +1579,7 @@ name = "mycctv"
 version = "1.10.0"
 dependencies = [
  "android_logger",
+ "bytemuck",
  "chrono",
  "eframe",
  "egui",

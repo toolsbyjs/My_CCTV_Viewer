@@ -52,11 +52,37 @@ pub struct Shared {
     pub speed_milli: AtomicU64,
     /// Keeps running while the app's screen is not drawn (TV sharing streams).
     pub always: AtomicBool,
+    /// Picture buffers handed back after use, so each new picture reuses one instead of asking the
+    /// system for fresh memory. A 2560x1440 picture is ~15 MB; getting new memory for it 25 times a
+    /// second per window makes the system zero hundreds of thousands of pages a second, which slows
+    /// down the whole computer.
+    spare: Mutex<Vec<Vec<u8>>>,
 }
+
+/// Buffers kept for reuse per video window: one being drawn, one waiting, one being filled.
+const SPARE_BUFFERS: usize = 3;
 
 impl Shared {
     pub fn state(&self) -> State {
         self.state.lock().unwrap().clone().unwrap_or(State::Connecting)
+    }
+    /// A buffer for the next picture (empty when none is spare).
+    pub fn spare_buffer(&self) -> Vec<u8> {
+        self.spare.lock().unwrap().pop().unwrap_or_default()
+    }
+    /// Hands a picture's buffer back for reuse.
+    pub fn recycle(&self, buf: Vec<u8>) {
+        let mut s = self.spare.lock().unwrap();
+        if s.len() < SPARE_BUFFERS && buf.capacity() > 0 {
+            s.push(buf);
+        }
+    }
+    /// Makes `p` the newest picture; one the screen never took is reused.
+    fn put_picture(&self, p: Picture) {
+        let old = self.picture.lock().unwrap().replace(p);
+        if let Some(old) = old {
+            self.recycle(old.rgba);
+        }
     }
     fn set_state(&self, s: State) {
         *self.state.lock().unwrap() = Some(s);
@@ -316,6 +342,7 @@ async fn run(ctx: &egui::Context, shared: &Shared, url: &str, user: &str, pass: 
     let mut fps_since = Instant::now();
     let mut size: (usize, usize);
     let mut clock0: Option<(Instant, f64)> = None; // (wall, media seconds) of the first picture
+    let mut buf: Vec<u8> = Vec::new(); // the next picture is converted into this (reused)
 
     loop {
         if shared.stop.load(Ordering::Relaxed) {
@@ -392,9 +419,13 @@ async fn run(ctx: &egui::Context, shared: &Shared, url: &str, user: &str, pass: 
         }
 
         let Some(dec) = decoder.as_mut() else { continue };
+        if buf.capacity() == 0 {
+            buf = shared.spare_buffer();
+        }
         // A damaged frame gives nothing; the next key frame recovers.
-        match dec.decode(frame.data()) {
-            Some(Picture { w, h, rgba }) => {
+        match dec.decode_into(frame.data(), &mut buf) {
+            Some((w, h)) => {
+                let rgba = std::mem::take(&mut buf);
                 let snap = shared.snapshot_to.lock().unwrap().take();
                 if let Some(path) = snap {
                     if let Some(dir) = path.parent() {
@@ -410,7 +441,7 @@ async fn run(ctx: &egui::Context, shared: &Shared, url: &str, user: &str, pass: 
                 let (t0, ts0) = *clock0.get_or_insert((Instant::now(), ts));
                 let lag = t0.elapsed().as_secs_f64() - (ts - ts0);
                 shared.lag_ms.store((lag.max(0.0) * 1000.0) as u64, Ordering::Relaxed);
-                *shared.picture.lock().unwrap() = Some(Picture { w, h, rgba });
+                shared.put_picture(Picture { w, h, rgba });
                 shared.frames.fetch_add(1, Ordering::Relaxed);
                 if shared.state() == State::Connecting {
                     shared.set_state(State::Playing);
@@ -436,10 +467,17 @@ pub enum VideoDecoder {
 }
 
 impl VideoDecoder {
-    /// Feeds one frame of Annex B video; returns the newest finished picture, if any.
+    /// Feeds one frame of Annex B video; returns the newest finished picture, if any (tests).
+    #[cfg(test)]
     pub fn decode(&mut self, data: &[u8]) -> Option<Picture> {
+        let mut rgba = Vec::new();
+        self.decode_into(data, &mut rgba).map(|(w, h)| Picture { w, h, rgba })
+    }
+
+    /// Like `decode`, but writes the picture into `out` (reusing its memory) and returns its size.
+    pub fn decode_into(&mut self, data: &[u8], out: &mut Vec<u8>) -> Option<(usize, usize)> {
         match self {
-            VideoDecoder::H264(d) => decode_rgba(d, data),
+            VideoDecoder::H264(d) => decode_rgba_into(d, data, out),
             VideoDecoder::H265(d) => {
                 if let Err(e) = d.push_annexb(data, None) {
                     log::debug!("h265: {e:?}");
@@ -448,14 +486,28 @@ impl VideoDecoder {
                 while let Ok(f) = d.next_frame() {
                     last = Some(f);
                 }
-                last.and_then(|f| h265_rgba(&f.picture))
+                last.and_then(|f| h265_rgba_into(&f.picture, out))
             }
         }
     }
 }
 
+/// Sizes `out` to `len` bytes without clearing what is there (every byte gets written).
+fn fit_buffer(out: &mut Vec<u8>, len: usize) {
+    if out.len() != len {
+        out.resize(len, 0);
+    }
+}
+
 /// Converts a decoded H.265 picture (4:2:0, 8 or 10 bit) to RGBA, cropped to its display size.
+#[cfg(test)]
 pub fn h265_rgba(p: &rusty_h265::Picture) -> Option<Picture> {
+    let mut rgba = Vec::new();
+    h265_rgba_into(p, &mut rgba).map(|(w, h)| Picture { w, h, rgba })
+}
+
+/// Like `h265_rgba`, into `rgba` (reusing its memory); returns the picture size.
+pub fn h265_rgba_into(p: &rusty_h265::Picture, rgba: &mut Vec<u8>) -> Option<(usize, usize)> {
     if p.chroma_format_idc != 1 {
         return None;
     }
@@ -466,7 +518,7 @@ pub fn h265_rgba(p: &rusty_h265::Picture) -> Option<Picture> {
     let shift_y = p.bit_depth_luma.saturating_sub(8) as u32;
     let shift_c = p.bit_depth_chroma.saturating_sub(8) as u32;
     let (yp, up, vp) = (&p.planes[0], &p.planes[1], &p.planes[2]);
-    let mut rgba = vec![0u8; w * h * 4];
+    fit_buffer(rgba, w * h * 4);
     for row in 0..h {
         let y_row = yp.row(cy + row);
         let c_y = (cy + row) / 2;
@@ -490,20 +542,27 @@ pub fn h265_rgba(p: &rusty_h265::Picture) -> Option<Picture> {
             out[o + 3] = 255;
         }
     }
-    Some(Picture { w, h, rgba })
+    Some((w, h))
 }
 
 /// Decodes one piece of H.264 (Annex B) into an RGBA picture, if it completes one.
+#[cfg(test)]
 pub fn decode_rgba(dec: &mut openh264::decoder::Decoder, data: &[u8]) -> Option<Picture> {
+    let mut rgba = Vec::new();
+    decode_rgba_into(dec, data, &mut rgba).map(|(w, h)| Picture { w, h, rgba })
+}
+
+/// Like `decode_rgba`, into `rgba` (reusing its memory); returns the picture size.
+pub fn decode_rgba_into(dec: &mut openh264::decoder::Decoder, data: &[u8], rgba: &mut Vec<u8>) -> Option<(usize, usize)> {
     use openh264::formats::YUVSource;
     let yuv = dec.decode(data).ok()??;
     let (w, h) = yuv.dimensions();
     if w == 0 || h == 0 {
         return None;
     }
-    let mut rgba = vec![0u8; w * h * 4];
-    yuv.write_rgba8(&mut rgba);
-    Some(Picture { w, h, rgba })
+    fit_buffer(rgba, w * h * 4);
+    yuv.write_rgba8(rgba);
+    Some((w, h))
 }
 
 #[cfg(test)]
@@ -714,6 +773,7 @@ fn run_dav(ctx: &egui::Context, shared: &Shared, url: &str, user: &str, pass: &s
     let mut rec: Option<std::fs::File> = None;
     let mut fps_count = 0u32;
     let mut fps_since = Instant::now();
+    let mut buf: Vec<u8> = Vec::new(); // the next picture is converted into this (reused)
     for (n, src) in sources.into_iter().enumerate() {
         if std::env::var("MYCCTV_DEBUG").is_ok() {
             eprintln!("source {n}: {src}");
@@ -804,7 +864,11 @@ fn run_dav(ctx: &egui::Context, shared: &Shared, url: &str, user: &str, pass: &s
                 Some(Codec::H264) => VideoDecoder::H264(openh264::decoder::Decoder::new().expect("decoder")),
                 _ => VideoDecoder::H265(Box::new(rusty_h265::Decoder::new())),
             });
-            if let Some(Picture { w, h, rgba }) = dec.decode(&frame.data) {
+            if buf.capacity() == 0 {
+                buf = shared.spare_buffer();
+            }
+            if let Some((w, h)) = dec.decode_into(&frame.data, &mut buf) {
+                let rgba = std::mem::take(&mut buf);
                 if let Some(path) = shared.snapshot_to.lock().unwrap().take() {
                     if let Some(dir) = path.parent() {
                         let _ = std::fs::create_dir_all(dir);
@@ -815,7 +879,7 @@ fn run_dav(ctx: &egui::Context, shared: &Shared, url: &str, user: &str, pass: &s
                         Err(e) => format!("Capture failed: {e}"),
                     });
                 }
-                *shared.picture.lock().unwrap() = Some(Picture { w, h, rgba });
+                shared.put_picture(Picture { w, h, rgba });
                 shared.frames.fetch_add(1, Ordering::Relaxed);
                 if shared.state() != State::Playing {
                     shared.set_state(State::Playing);

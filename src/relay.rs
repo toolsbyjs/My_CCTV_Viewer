@@ -227,6 +227,7 @@ fn mjpeg(c: &mut TcpStream, routes: Vec<crate::stream::Route>, stop: &AtomicBool
         seen = f;
         let Some(pic) = h.shared.picture.lock().unwrap().take() else { continue };
         let jpeg = encode(&pic);
+        h.shared.recycle(pic.rgba);
         write!(c, "--mycctvframe\r\nContent-Type: image/jpeg\r\nContent-Length: {}\r\n\r\n", jpeg.len())?;
         c.write_all(&jpeg)?;
         c.write_all(b"\r\n")?;

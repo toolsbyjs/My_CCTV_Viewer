@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+- Fixed: watching live video for a few minutes made the whole computer slow. Every picture (about 15 MB for a
+  2560x1440 camera, 25 times a second per window) was put in brand-new memory twice, so Windows had to clear
+  hundreds of thousands of memory pages a second. Pictures now reuse their memory and go to the screen
+  without being copied, and the picture on the graphics card is updated in place
+  (page faults with two 1440p cameras: about 362,000/s before, about 250/s after).
+
 ## 1.10.0
 - Smoother computer: live view and playback only use the network and processor while you can see them. They
   pause on other pages, behind an enlarged window, behind the lock screen, and while the app is minimized or in
