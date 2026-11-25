@@ -52,8 +52,8 @@ The Mac app has to be built on a Mac (Apple's tools only run there). Either:
 - **On a Mac:** install the Xcode command line tools (`xcode-select --install`) and Rust (https://rustup.rs),
   then in the app folder run `bash scripts/build-macos.sh`. It makes `release/MyCCTV.app` and
   `release/MyCCTV-<version>-macos-universal.dmg`, one app for both Apple-silicon (M1–M4) and Intel Mac minis.
-- **Without a Mac:** put the app folder in a GitHub repository and run the **Build macOS** action
-  (`.github/workflows/build-macos.yml`); download the `.dmg` from the run.
+- **Without a Mac:** run the **Release** action on GitHub (`.github/workflows/release.yml`, "Run workflow");
+  it builds the `.dmg` on GitHub's Macs. Download it from the run's artifacts.
 
 Open the `.dmg` and drag MyCCTV to Applications. The first time, right-click MyCCTV → **Open** (the app is not
 signed with an Apple developer certificate yet). When macOS asks to let MyCCTV find devices on your local

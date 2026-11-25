@@ -1,0 +1,183 @@
+# Builds MyCCTV for Windows, Android / Google TV and macOS, and publishes a GitHub Release.
+#
+# Release:   raise `version` in Cargo.toml, add a "## <version>" section to CHANGELOG.md, commit, then
+#            git tag v<version> && git push origin v<version>
+# Try-out:   run it from the Actions tab ("Run workflow"): everything is built and kept as run
+#            artifacts, nothing is published.
+#
+# Android signing: set the repository secrets ANDROID_KEYSTORE_BASE64 (the keystore file, base64) and
+# ANDROID_KEYSTORE_PASSWORD so every release is signed with the same key and installs over the last one.
+# Without them the APK is signed with a throwaway key (a warning is shown on the run).
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  version:
+    name: Check version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: v
+        name: Read version from Cargo.toml
+        run: |
+          v=$(grep -m1 '^version' Cargo.toml | cut -d'"' -f2)
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          if [ "$GITHUB_REF_TYPE" = "tag" ] && [ "$GITHUB_REF_NAME" != "v$v" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match Cargo.toml version $v"
+            exit 1
+          fi
+          if ! grep -q "^## $v\$" CHANGELOG.md; then
+            echo "::warning::CHANGELOG.md has no '## $v' section; the release notes will be short"
+          fi
+
+  windows:
+    name: Windows x64
+    needs: version
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Tests
+        run: cargo test --release --lib --locked
+      - name: Build
+        run: cargo build --release --locked
+      - name: Package
+        shell: bash
+        run: |
+          mkdir dist
+          cp target/release/mycctv.exe "dist/MyCCTV-${{ needs.version.outputs.version }}-windows-x64.exe"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: dist/*
+          if-no-files-found: error
+
+  android:
+    name: Android / Google TV
+    needs: version
+    runs-on: ubuntu-latest
+    env:
+      NDK_VERSION: 27.2.12479018
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: android
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Android SDK platform 33 and NDK 27
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;$NDK_VERSION" "platforms;android-33" "build-tools;34.0.0" > /dev/null
+          echo "ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/$NDK_VERSION" >> "$GITHUB_ENV"
+      - name: Install cargo-apk
+        run: cargo install cargo-apk --locked
+      - name: Signing key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/keys"
+          ks="$RUNNER_TEMP/keys/release.keystore"
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$ks"
+            echo "::add-mask::$KEYSTORE_PASSWORD"
+            pass="$KEYSTORE_PASSWORD"
+          else
+            echo "::warning::No ANDROID_KEYSTORE_BASE64 secret: the APK is signed with a throwaway key and will not install over an APK signed with your own key."
+            pass="throwaway-$GITHUB_RUN_ID"
+            keytool -genkeypair -keystore "$ks" -storepass "$pass" -keypass "$pass" -alias mycctv \
+              -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=MyCCTV CI" > /dev/null
+          fi
+          echo "CARGO_APK_RELEASE_KEYSTORE=$ks" >> "$GITHUB_ENV"
+          echo "CARGO_APK_RELEASE_KEYSTORE_PASSWORD=$pass" >> "$GITHUB_ENV"
+      - name: Build APK (arm64 + armv7)
+        run: cargo apk build --lib --release
+      - name: Package
+        run: |
+          mkdir dist
+          cp target/release/apk/MyCCTV.apk "dist/MyCCTV-${{ needs.version.outputs.version }}-android-googletv.apk"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: dist/*
+          if-no-files-found: error
+
+  macos:
+    name: macOS universal
+    needs: version
+    runs-on: macos-14
+    # The Mac app is not tested on a real Mac yet: a failure here doesn't hold back the release.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+      - uses: Swatinem/rust-cache@v2
+      - name: Build universal app and disk image
+        run: bash scripts/build-macos.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: release/MyCCTV-*-macos-universal.dmg
+          if-no-files-found: error
+
+  publish:
+    name: Publish release
+    needs: [version, windows, android, macos]
+    if: always() && github.ref_type == 'tag' && needs.windows.result == 'success' && needs.android.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Checksums and release notes
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+          REPO: ${{ github.repository }}
+        run: |
+          cd dist && sha256sum * > SHA256SUMS.txt && cd ..
+          {
+            awk -v v="## $VERSION" '$0 == v {found = 1; next} /^## / {if (found) exit} found' CHANGELOG.md
+            echo
+            echo "### Downloads"
+            echo
+            echo "| File | For |"
+            echo "|---|---|"
+            for f in dist/*; do
+              n=$(basename "$f")
+              case "$n" in
+                *windows*) echo "| [$n](https://github.com/$REPO/releases/download/v$VERSION/$n) | Windows 10 / 11, 64-bit. No installer: copy it anywhere and run it. |" ;;
+                *android*) echo "| [$n](https://github.com/$REPO/releases/download/v$VERSION/$n) | Android 7+: phones, tablets, Android TV, Google TV, Fire TV (64- and 32-bit). |" ;;
+                *macos*)   echo "| [$n](https://github.com/$REPO/releases/download/v$VERSION/$n) | macOS 11+, Apple silicon and Intel. First start: right-click → Open. |" ;;
+              esac
+            done
+            echo
+            echo "Checksums are in \`SHA256SUMS.txt\`. Changes in every version: [CHANGELOG.md](https://github.com/$REPO/blob/main/CHANGELOG.md)."
+          } > notes.md
+          cat notes.md
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: MyCCTV ${{ needs.version.outputs.version }}
+          body_path: notes.md
+          files: dist/*
+          fail_on_unmatched_files: true

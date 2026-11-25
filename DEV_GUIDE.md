@@ -10,7 +10,7 @@ through glow). There is no C++ or Java code of our own; native pieces come from 
 |---|---|
 | Windows build | Rust (stable, 1.85+), MSVC build tools |
 | Android build | `rustup target add aarch64-linux-android armv7-linux-androideabi`, Android SDK (build-tools, platform 33), NDK 27, `cargo install cargo-apk`, a JDK (for `keytool`/signing) |
-| macOS build (on a Mac) | Xcode command line tools, Rust; `bash scripts/build-macos.sh` (universal app + .dmg), or the GitHub action `.github/workflows/build-macos.yml` |
+| macOS build (on a Mac) | Xcode command line tools, Rust; `bash scripts/build-macos.sh` (universal app + .dmg), or the GitHub **Release** workflow (it builds on GitHub's Macs) |
 | Tests with sample video | ffmpeg (optional, to make test clips) |
 
 ## Build, run, test
@@ -27,14 +27,34 @@ through glow). There is no C++ or Java code of our own; native pieces come from 
 
 ### Making a release
 1. Raise `version` in `Cargo.toml` (the APK takes its version name and code from it).
-2. Add the changes to `CHANGELOG.md`.
-3. Build both (commands above), then copy into `release/`:
-   `MyCCTV-<version>-windows-x64.exe` and `MyCCTV-<version>-android-googletv.apk`.
+2. Add a `## <version>` section to `CHANGELOG.md`; it becomes the release notes.
+3. Commit, then tag and push: `git tag v<version>` and `git push origin main v<version>`.
+
+The **Release** workflow (`.github/workflows/release.yml`) then builds on GitHub's machines:
+`MyCCTV-<version>-windows-x64.exe` (Windows, after the unit tests), `MyCCTV-<version>-android-googletv.apk`
+(Linux, NDK 27, cargo-apk) and `MyCCTV-<version>-macos-universal.dmg` (macOS 14; allowed to fail while the Mac
+build is untested), and publishes a GitHub Release with those files, `SHA256SUMS.txt` and the changelog section.
+The tag must match the `Cargo.toml` version. "Run workflow" on the Actions tab builds everything without
+publishing (files are kept as run artifacts).
+
+Local builds still work as before (commands above, files copied into `release/`, which is not in git).
+
+### Continuous integration and website
+- **CI** (`.github/workflows/ci.yml`): every push to `main` and every pull request is built and tested on Windows.
+- **Pages** (`.github/workflows/pages.yml`): the website in `site/` is published to GitHub Pages when it
+  changes. Its download buttons ask the GitHub API for the newest release in the visitor's browser, so a new
+  release shows up without publishing the site again. The pictures in `site/img/` were taken with
+  `--screenshot` and a demo device list (see "Command-line options"), not real cameras.
 
 ### Signing
-`keys/release.keystore` is a local key so the APK installs. Before publishing on Google Play, create your own
-key (`keytool -genkeypair …`), keep it safe, and point `[package.metadata.android.signing.release]` in
-`Cargo.toml` at it (and don't keep its password in the file).
+`keys/release.keystore` is a local key so the APK installs (`keys/` is not in git). Before publishing on Google
+Play, create your own key (`keytool -genkeypair …`), keep it safe, and point
+`[package.metadata.android.signing.release]` in `Cargo.toml` at it (and don't keep its password in the file).
+
+GitHub releases are signed with the key in the repository secrets `ANDROID_KEYSTORE_BASE64` (the keystore file,
+base64-encoded) and `ANDROID_KEYSTORE_PASSWORD` (cargo-apk reads them as `CARGO_APK_RELEASE_KEYSTORE` and
+`CARGO_APK_RELEASE_KEYSTORE_PASSWORD`). Without them the workflow signs with a throwaway key, and that APK won't
+install over one signed with your key.
 
 ## Command-line options (`src/main.rs`)
 
