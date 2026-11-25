@@ -1,0 +1,29 @@
+# Builds and tests MyCCTV on every push to main and every pull request.
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ["site/**", "**.md", ".github/workflows/pages.yml"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    name: Windows build and tests
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Build
+        run: cargo build --release --locked
+      - name: Unit tests (layouts, devices, decoders, network paths)
+        run: cargo test --release --lib --locked
