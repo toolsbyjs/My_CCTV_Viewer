@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MyCCTV — camera and recorder viewer</title>
+  <meta name="description" content="Watch your NVR, DVR and IP cameras live, play back recordings and get alarms on Windows, macOS, Android phones and Google TV. Free and open source.">
+  <meta name="theme-color" content="#0B0F14">
+  <meta property="og:title" content="MyCCTV — camera and recorder viewer">
+  <meta property="og:description" content="Live view, playback and alarms for NVR/DVR recorders and IP cameras on Windows, macOS, Android and Google TV.">
+  <meta property="og:image" content="img/desktop-home.png">
+  <link rel="icon" type="image/png" href="img/icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap nav-row">
+      <a class="brand" href="#top"><img src="img/icon.png" alt="" width="32" height="32"> MyCCTV</a>
+      <nav class="nav-links" aria-label="Sections">
+        <a href="#features">Features</a>
+        <a href="#screens">Screens</a>
+        <a href="#tvs">TVs</a>
+        <a href="#download">Download</a>
+        <a href="https://github.com/toolsbyjs/My_CCTV_Viewer" class="gh">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="dot"></span> Free and open source</p>
+          <h1>Your cameras, on every screen you own.</h1>
+          <p class="lead">MyCCTV shows live video, recordings and alarms from NVR / DVR recorders and IP cameras on
+            Windows, macOS, Android phones and tablets, and Google TV. One small app, no cloud account, nothing leaves your home network.</p>
+          <div class="cta">
+            <a class="btn primary" id="main-download" href="#download">Download</a>
+            <a class="btn ghost" href="#download">All platforms</a>
+          </div>
+          <p class="fine" id="version-line">H.264 and H.265 cameras · RTSP · Dahua-compatible recorders (CP Plus and others)</p>
+        </div>
+        <div class="hero-shot">
+          <img class="shot-desktop" src="img/desktop-home.png" alt="MyCCTV dashboard on a computer: devices online, cameras and recent events" width="1366" height="768">
+          <img class="shot-phone" src="img/phone-playback.png" alt="MyCCTV playback search on a phone" width="412" height="860">
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="section">
+      <div class="wrap">
+        <h2>Everything you open the recorder's own app for</h2>
+        <p class="section-lead">Built for home and small-shop setups: one recorder or several, cameras on a second router, a TV in the living room.</p>
+        <div class="features">
+          <article class="card">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>
+            <h3>Live view, 1 to 64 windows</h3>
+            <p>Twelve layouts, tours, digital zoom up to 8× and camera control (PTZ) with presets. Sharp or light stream picked for you.</p>
+          </article>
+          <article class="card">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5z"/></svg>
+            <h3>Playback to the second</h3>
+            <p>A zoomable 24-hour timeline, 1/8× to 8× speed, clips and pictures. Falls back to the recorder's own files when it refuses standard playback.</p>
+          </article>
+          <article class="card">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+            <h3>Motion and alarms</h3>
+            <p>Motion, alarm inputs, video loss and smart detections arrive as they happen, with a Watch button to jump to the camera.</p>
+          </article>
+          <article class="card">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>
+            <h3>The device's own settings</h3>
+            <p>Video quality, picture, detection, recording, time and network, plus every other setting the device offers, searchable.</p>
+          </article>
+          <article class="card">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9a15 15 0 0 1 20 0"/><path d="M5.5 12.5a10 10 0 0 1 13 0"/><path d="M9 16a5 5 0 0 1 6 0"/><circle cx="12" cy="19" r="1"/></svg>
+            <h3>Cameras on another router</h3>
+            <p>Reach a recorder through a second Wi-Fi adapter or cable while the computer keeps its main internet connection, even with the same addresses on both.</p>
+          </article>
+          <article class="card">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            <h3>Made for the remote too</h3>
+            <p>Mouse, touch or TV remote. The layout adapts to phones, tablets, desktops and TVs, and browser-only TVs get a web app.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="screens" class="section alt">
+      <div class="wrap">
+        <h2>A calm, dark interface</h2>
+        <p class="section-lead">The same app on a 27-inch monitor and a phone. These pictures use a demo device list.</p>
+        <div class="tabs" role="tablist" aria-label="Screens">
+          <button role="tab" aria-selected="true" data-shot="desktop-live">Live</button>
+          <button role="tab" aria-selected="false" data-shot="desktop-playback">Playback</button>
+          <button role="tab" aria-selected="false" data-shot="desktop-devices">Devices</button>
+          <button role="tab" aria-selected="false" data-shot="desktop-home">Dashboard</button>
+        </div>
+        <figure class="gallery">
+          <img id="gallery-img" src="img/desktop-live.png" alt="Live view with four windows and the camera list" width="1366" height="768">
+        </figure>
+        <div class="phones">
+          <img src="img/phone-home.png" alt="Dashboard on a phone" width="412" height="860" loading="lazy">
+          <img src="img/phone-live.png" alt="Live view on a phone" width="412" height="860" loading="lazy">
+          <img src="img/phone-playback.png" alt="Playback on a phone" width="412" height="860" loading="lazy">
+        </div>
+      </div>
+    </section>
+
+    <section id="download" class="section">
+      <div class="wrap">
+        <h2>Download</h2>
+        <p class="section-lead" id="release-line">The newest release from GitHub.</p>
+        <div class="downloads">
+          <article class="dl" data-kind="windows">
+            <h3>Windows</h3>
+            <p>Windows 10 and 11, 64-bit. One program, no installer: copy it anywhere and run it.</p>
+            <a class="btn primary" href="https://github.com/toolsbyjs/My_CCTV_Viewer/releases/latest">Download .exe</a>
+            <span class="meta"></span>
+          </article>
+          <article class="dl" data-kind="android">
+            <h3>Android and Google TV</h3>
+            <p>Android 7 or newer: phones, tablets, Android TV, Google TV and Fire TV. 64-bit and 32-bit devices.</p>
+            <a class="btn primary" href="https://github.com/toolsbyjs/My_CCTV_Viewer/releases/latest">Download .apk</a>
+            <span class="meta"></span>
+          </article>
+          <article class="dl" data-kind="macos">
+            <h3>macOS</h3>
+            <p>macOS 11 or newer, Apple silicon and Intel. First start: right-click the app and choose Open.</p>
+            <a class="btn primary" href="https://github.com/toolsbyjs/My_CCTV_Viewer/releases/latest">Download .dmg</a>
+            <span class="meta"></span>
+          </article>
+        </div>
+        <p class="fine center"><a href="https://github.com/toolsbyjs/My_CCTV_Viewer/releases">All releases and checksums</a> ·
+          <a href="https://github.com/toolsbyjs/My_CCTV_Viewer/blob/main/CHANGELOG.md">What's new</a></p>
+      </div>
+    </section>
+
+    <section id="tvs" class="section alt">
+      <div class="wrap">
+        <h2>Which TVs</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>TV or stick</th><th>How</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Google TV</strong><br><span>Chromecast with Google TV, Google TV Streamer, Sony, TCL, Hisense Google TV</span></td><td>Install the APK; MyCCTV appears in the apps list.</td></tr>
+              <tr><td><strong>Android TV</strong><br><span>Boxes and TVs with Android 7 or newer</span></td><td>Install the APK.</td></tr>
+              <tr><td><strong>Amazon Fire TV</strong><br><span>Fire OS 6, 7 or 8 (most models from 2018 on)</span></td><td>Sideload the APK with Downloader or adb. Not yet tried on a real Fire TV.</td></tr>
+              <tr><td><strong>Hisense VIDAA</strong>, LG webOS, Samsung Tizen<br><span>TVs that only have a browser</span></td><td>Turn on <em>TV sharing</em> in MyCCTV on a computer or Android box, then open the address it shows in the TV's browser.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <h2>Up and running in a minute</h2>
+        <ol class="steps">
+          <li><strong>Add your recorder.</strong> Devices → Add device, or Scan network to find it. Type its address, user name and password.</li>
+          <li><strong>MyCCTV reads the rest.</strong> Model, serial number, cameras and the camera behind each recorder channel.</li>
+          <li><strong>Watch.</strong> Open Live and double-click a camera, or press Watch on a device to open all of them.</li>
+        </ol>
+        <p class="fine center">The device needs standard video streaming (RTSP, usually on by default).
+          Stuck? See <a href="https://github.com/toolsbyjs/My_CCTV_Viewer/blob/main/TROUBLESHOOTING.md">Troubleshooting</a>.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-row">
+      <span>MyCCTV · Apache License 2.0</span>
+      <span><a href="https://github.com/toolsbyjs/My_CCTV_Viewer">Source</a> ·
+        <a href="https://github.com/toolsbyjs/My_CCTV_Viewer/issues">Report a problem</a> ·
+        <a href="https://github.com/toolsbyjs/My_CCTV_Viewer/blob/main/DEV_GUIDE.md">Developer guide</a></span>
+    </div>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>
