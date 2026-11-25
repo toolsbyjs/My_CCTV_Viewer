@@ -1,0 +1,44 @@
+/* MyCCTV TV app: 10-foot screen, dark "Midnight" colours, big focus rings for remotes. */
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: #0b0f14; color: #c3cdda; font-family: "Segoe UI", Roboto, Arial, sans-serif; overflow: hidden; }
+button { font: inherit; color: inherit; background: #222c3a; border: 2px solid transparent; border-radius: 12px; padding: 10px 22px; cursor: pointer; }
+button:focus, button.focus { outline: none; border-color: #4f7cff; background: #2a3647; color: #fff; }
+button.on { background: #4f7cff; color: #fff; }
+
+#top { position: fixed; left: 0; right: 0; top: 0; height: 72px; display: flex; align-items: center; gap: 18px; padding: 0 28px; background: #121821; border-bottom: 1px solid #263142; }
+.brand { display: flex; align-items: center; gap: 12px; font-size: 26px; color: #f4f7fb; font-weight: 600; margin-right: auto; }
+.brand img { width: 40px; height: 40px; }
+#layouts { display: flex; gap: 8px; }
+#clock { font-size: 24px; color: #6f7e94; min-width: 90px; text-align: right; }
+
+#wall { position: fixed; left: 16px; right: 16px; top: 88px; bottom: 64px; display: grid; gap: 8px; }
+.tile { position: relative; background: #07090c; border: 3px solid #1a222e; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.tile.sel { border-color: #4f7cff; }
+.tile.ptz { border-color: #ffb020; }
+.tile img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.tile .name { position: absolute; left: 12px; top: 10px; background: rgba(0,0,0,.6); color: #fff; padding: 4px 12px; border-radius: 14px; font-size: 18px; }
+.tile .name i { font-style: normal; background: #19c3b1; border-radius: 10px; padding: 1px 8px; margin-right: 8px; font-size: 14px; }
+.tile .empty { color: #6f7e94; font-size: 22px; text-align: center; }
+.tile .empty b { display: block; font-size: 56px; color: #263142; }
+.tile .msg { position: absolute; bottom: 12px; left: 12px; right: 12px; text-align: center; color: #ffb020; font-size: 18px; }
+#wall.full .tile:not(.sel) { display: none; }
+#wall.full .tile.sel { grid-column: 1 / -1; grid-row: 1 / -1; }
+
+#hint { position: fixed; left: 0; right: 0; bottom: 0; height: 52px; display: flex; gap: 34px; align-items: center; justify-content: center; font-size: 18px; color: #6f7e94; background: #121821; border-top: 1px solid #263142; }
+#hint b { color: #f4f7fb; }
+#hint b.g { color: #3cc86e; }
+#hint b.y { color: #ffd23f; }
+
+.overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(5,8,12,.82); display: flex; align-items: center; justify-content: center; z-index: 10; }
+.hidden { display: none !important; }
+.panel { width: 720px; max-width: 90vw; max-height: 82vh; overflow: auto; background: #18202b; border: 1px solid #263142; border-radius: 20px; padding: 28px 32px; }
+.panel h2 { margin: 0 0 16px; color: #f4f7fb; font-weight: 600; font-size: 30px; }
+.panel p { font-size: 20px; line-height: 1.4; }
+.panel label { display: block; font-size: 20px; margin: 14px 0; }
+.panel input { display: block; width: 100%; margin-top: 8px; font-size: 24px; padding: 12px 16px; border-radius: 12px; border: 2px solid #263142; background: #0b0f14; color: #fff; }
+.panel input:focus { outline: none; border-color: #4f7cff; }
+.item { display: block; width: 100%; text-align: left; margin: 8px 0; font-size: 22px; }
+.group { margin: 18px 0 6px; color: #6f7e94; font-size: 18px; text-transform: uppercase; letter-spacing: .05em; }
+.err { color: #ff5470; min-height: 1.4em; }
+
+#ptz { position: fixed; left: 50%; transform: translateX(-50%); bottom: 70px; background: #ffb020; color: #111; padding: 10px 24px; border-radius: 24px; font-size: 20px; z-index: 5; }

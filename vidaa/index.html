@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MyCCTV</title>
+<link rel="icon" href="icon.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="top">
+  <div class="brand"><img src="icon.png" alt=""><span>MyCCTV</span></div>
+  <div id="layouts">
+    <button class="lay" data-n="1">1</button>
+    <button class="lay" data-n="4">4</button>
+    <button class="lay" data-n="9">9</button>
+  </div>
+  <button id="btnCams">Cameras</button>
+  <div id="clock"></div>
+</div>
+
+<div id="wall"></div>
+
+<div id="hint">
+  <span><b>Arrows</b> move</span>
+  <span><b>OK</b> choose camera</span>
+  <span><b class="g">Green</b> / F full screen</span>
+  <span><b class="y">Yellow</b> / P camera control</span>
+  <span><b>1 4 9</b> layout</span>
+  <span><b>Back</b> close</span>
+</div>
+
+<div id="picker" class="overlay hidden">
+  <div class="panel">
+    <h2>Choose a camera</h2>
+    <div id="camlist"></div>
+    <button id="btnClear" class="item">Empty this window</button>
+  </div>
+</div>
+
+<div id="setup" class="overlay hidden">
+  <div class="panel">
+    <h2>Connect to MyCCTV</h2>
+    <p>Turn on <b>TV sharing</b> in MyCCTV (Settings) on your computer or Android box. It shows the address and the access code.</p>
+    <label id="serverRow">Address <input id="server" type="text" placeholder="http://192.168.1.36:8090"></label>
+    <label>Access code <input id="key" type="text" inputmode="numeric" placeholder="1234"></label>
+    <p id="setupError" class="err"></p>
+    <button id="btnConnect" class="item">Connect</button>
+  </div>
+</div>
+
+<div id="ptz" class="hidden">Camera control: <b>arrows</b> move, <b>1</b>/<b>3</b> zoom out/in, <b>Back</b> to finish</div>
+
+<script src="app.js"></script>
+</body>
+</html>

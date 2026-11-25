@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>MyCCTV</string>
+    <key>CFBundleDisplayName</key>
+    <string>MyCCTV</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.mycctv.viewer</string>
+    <key>CFBundleExecutable</key>
+    <string>mycctv</string>
+    <key>CFBundleIconFile</key>
+    <string>app.icns</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>__VERSION__</string>
+    <key>CFBundleVersion</key>
+    <string>__VERSION__</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>11.0</string>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.utilities</string>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>NSPrincipalClass</key>
+    <string>NSApplication</string>
+    <!-- macOS 15+ asks before an app talks to devices on the home network (cameras, recorders, TVs). -->
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>MyCCTV connects to your cameras and recorders on your home network to show live video and recordings, and can share them with your TVs.</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>MyCCTV</string>
+</dict>
+</plist>
