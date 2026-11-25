@@ -1,5 +1,7 @@
 # MyCCTV
 
+[![CI](https://github.com/toolsbyjs/My_CCTV_Viewer/actions/workflows/ci.yml/badge.svg)](https://github.com/toolsbyjs/My_CCTV_Viewer/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/toolsbyjs/My_CCTV_Viewer)](https://github.com/toolsbyjs/My_CCTV_Viewer/releases/latest)
+
 A viewer for camera recorders (NVR/DVR) and IP cameras. One app for **Windows**, **macOS (Mac mini and other Macs)**, **Android phones and
 tablets**, and **Android TV / Google TV**, written in Rust.
 
@@ -10,18 +12,18 @@ tablets**, and **Android TV / Google TV**, written in Rust.
 - The devices' own settings (video quality, picture, detection, recording, time, network and every other setting they offer)
 - Works with a mouse, touch screen or TV remote; adapts to phone, tablet, desktop and TV screens
 
-## Download and install (release 1.10.0)
+## Download and install
 
-The ready-made files are in the `release/` folder:
+Website: **https://toolsbyjs.github.io/My_CCTV_Viewer/** · Downloads: **[GitHub Releases](https://github.com/toolsbyjs/My_CCTV_Viewer/releases/latest)**
 
 | File | For |
 |---|---|
-| `MyCCTV-1.10.0-windows-x64.exe` | Windows 10 / 11 (64-bit). One program, no installer: copy it anywhere and run it. |
-| `MyCCTV-1.10.0-android-googletv.apk` | Android 7 or newer: phones, tablets, Android TV, Google TV (64-bit and 32-bit devices). |
-| `MyCCTV-1.10.0-macos-universal.dmg` | macOS 11 or newer: Mac mini, MacBook, iMac (Apple silicon and Intel). Built on a Mac, see *Mac* below. |
+| `MyCCTV-<version>-windows-x64.exe` | Windows 10 / 11 (64-bit). One program, no installer: copy it anywhere and run it. |
+| `MyCCTV-<version>-android-googletv.apk` | Android 7 or newer: phones, tablets, Android TV, Google TV (64-bit and 32-bit devices). |
+| `MyCCTV-<version>-macos-universal.dmg` | macOS 11 or newer: Mac mini, MacBook, iMac (Apple silicon and Intel). See *Mac* below. |
 
 **Android / Google TV:** copy the `.apk` to the device and open it (allow "install unknown apps" for the
-file manager), or from a computer: `adb install -r MyCCTV-1.10.0-android-googletv.apk`.
+file manager), or from a computer: `adb install -r MyCCTV-<version>-android-googletv.apk`.
 On Google TV, MyCCTV appears in the apps list.
 
 ## Which TVs
@@ -36,12 +38,12 @@ On Google TV, MyCCTV appears in the apps list.
 **Install on Google TV:** Settings → System → About → click *Android TV OS build* 7 times to become a
 developer; Settings → Apps → Security & restrictions → allow your file manager to install unknown apps; copy the
 `.apk` with a USB stick or a file-sharing app and open it. Or from a computer: `adb connect <TV-IP>` then
-`adb install -r MyCCTV-1.10.0-android-googletv.apk`.
+`adb install -r MyCCTV-<version>-android-googletv.apk`.
 
 **Install on Fire TV Stick:** Settings → My Fire TV → About → click the device name 7 times; Settings → My Fire TV →
 Developer options → *Install unknown apps* → allow **Downloader**; in **Downloader**, type
 `http://<PC address>:8090/apk` (MyCCTV on the PC with TV sharing on, and the `.apk` next to the `.exe`, as in the
-`release/` folder) and install. Or use `adb connect <FireTV-IP>` and `adb install -r MyCCTV-1.10.0-android-googletv.apk`.
+`release/` folder) and install. Or use `adb connect <FireTV-IP>` and `adb install -r MyCCTV-<version>-android-googletv.apk`.
 
 On TVs, turn on Settings → *Arrow keys move between buttons* in MyCCTV (it is on by default on Android).
 

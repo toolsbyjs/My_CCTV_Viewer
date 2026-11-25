@@ -1,11 +1,13 @@
 # Changelog
 
-## Unreleased
+## 1.10.1
 - Fixed: watching live video for a few minutes made the whole computer slow. Every picture (about 15 MB for a
   2560x1440 camera, 25 times a second per window) was put in brand-new memory twice, so Windows had to clear
   hundreds of thousands of memory pages a second. Pictures now reuse their memory and go to the screen
   without being copied, and the picture on the graphics card is updated in place
   (page faults with two 1440p cameras: about 362,000/s before, about 250/s after).
+- Downloads now come from GitHub Releases, built by GitHub Actions for Windows, Android / Google TV and macOS;
+  website: https://toolsbyjs.github.io/My_CCTV_Viewer/
 
 ## 1.10.0
 - Smoother computer: live view and playback only use the network and processor while you can see them. They

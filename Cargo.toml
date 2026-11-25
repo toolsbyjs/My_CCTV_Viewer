@@ -1,6 +1,6 @@
 [package]
 name = "mycctv"
-version = "1.10.0"
+version = "1.10.1"
 edition = "2021"
 description = "MyCCTV - a camera and recorder viewer for Windows, Android and Google TV"
 default-run = "mycctv"
