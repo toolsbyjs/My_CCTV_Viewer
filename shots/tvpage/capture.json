@@ -1,0 +1,430 @@
+{
+  "a11y": {
+    "images_without_alt": 4,
+    "landmarks": {},
+    "lang": "en",
+    "unnamed_controls": 0,
+    "unnamed_examples": []
+  },
+  "assets": {
+    "background_images": [],
+    "fonts": [],
+    "images": [
+      {
+        "alt": "",
+        "h": 256,
+        "src": "http://127.0.0.1:8090/icon.png",
+        "w": 256
+      },
+      {
+        "alt": "",
+        "h": 576,
+        "src": "http://127.0.0.1:8090/mjpeg?key=008993&dev=1&ch=0&s=1",
+        "w": 704
+      },
+      {
+        "alt": "",
+        "h": 576,
+        "src": "http://127.0.0.1:8090/mjpeg?key=008993&dev=1&ch=1&s=1",
+        "w": 704
+      },
+      {
+        "alt": "",
+        "h": 0,
+        "src": "http://127.0.0.1:8090/mjpeg?key=008993&dev=1&ch=2&s=1",
+        "w": 0
+      },
+      {
+        "alt": "",
+        "h": 0,
+        "src": "http://127.0.0.1:8090/mjpeg?key=008993&dev=1&ch=3&s=1",
+        "w": 0
+      }
+    ],
+    "inline_scripts": 0,
+    "requests": [
+      {
+        "bytes": 4012,
+        "type": "link",
+        "url": "http://127.0.0.1:8090/style.css"
+      },
+      {
+        "bytes": 13086,
+        "type": "img",
+        "url": "http://127.0.0.1:8090/icon.png"
+      },
+      {
+        "bytes": 11380,
+        "type": "script",
+        "url": "http://127.0.0.1:8090/app.js"
+      },
+      {
+        "bytes": 599,
+        "type": "xmlhttprequest",
+        "url": "http://127.0.0.1:8090/api/devices"
+      },
+      {
+        "bytes": 0,
+        "type": "img",
+        "url": "http://127.0.0.1:8090/mjpeg"
+      },
+      {
+        "bytes": 0,
+        "type": "img",
+        "url": "http://127.0.0.1:8090/mjpeg"
+      },
+      {
+        "bytes": 13086,
+        "type": "other",
+        "url": "http://127.0.0.1:8090/icon.png"
+      }
+    ],
+    "scripts": [
+      "http://127.0.0.1:8090/app.js"
+    ],
+    "stylesheets": [
+      "http://127.0.0.1:8090/style.css"
+    ]
+  },
+  "breakpoints": [],
+  "design": {
+    "backgrounds": [
+      {
+        "count": 4,
+        "value": "#07090c"
+      },
+      {
+        "count": 4,
+        "value": "#00000099"
+      },
+      {
+        "count": 4,
+        "value": "#19c3b1"
+      },
+      {
+        "count": 3,
+        "value": "#222c3a"
+      },
+      {
+        "count": 2,
+        "value": "#0b0f14"
+      },
+      {
+        "count": 2,
+        "value": "#121821"
+      },
+      {
+        "count": 1,
+        "value": "#4f7cff"
+      }
+    ],
+    "css_variables": {},
+    "font_faces": [],
+    "font_sizes": [
+      {
+        "count": 16,
+        "value": "18px"
+      },
+      {
+        "count": 4,
+        "value": "16px"
+      },
+      {
+        "count": 4,
+        "value": "14px"
+      },
+      {
+        "count": 1,
+        "value": "26px"
+      },
+      {
+        "count": 1,
+        "value": "24px"
+      }
+    ],
+    "font_weights": [
+      {
+        "count": 19,
+        "value": "400"
+      },
+      {
+        "count": 6,
+        "value": "700"
+      },
+      {
+        "count": 1,
+        "value": "600"
+      }
+    ],
+    "fonts": [
+      {
+        "count": 26,
+        "value": "\"Segoe UI\", Roboto, Arial, sans-serif"
+      }
+    ],
+    "max_widths": [],
+    "radii": [
+      {
+        "count": 8,
+        "value": "12px"
+      },
+      {
+        "count": 4,
+        "value": "14px"
+      },
+      {
+        "count": 4,
+        "value": "10px"
+      }
+    ],
+    "shadows": [],
+    "spacing": [
+      {
+        "count": 12,
+        "value": "8px"
+      },
+      {
+        "count": 10,
+        "value": "12px"
+      },
+      {
+        "count": 8,
+        "value": "10px"
+      },
+      {
+        "count": 8,
+        "value": "22px"
+      },
+      {
+        "count": 8,
+        "value": "4px"
+      },
+      {
+        "count": 8,
+        "value": "1px"
+      },
+      {
+        "count": 2,
+        "value": "28px"
+      },
+      {
+        "count": 2,
+        "value": "18px"
+      },
+      {
+        "count": 2,
+        "value": "34px"
+      }
+    ],
+    "text_colors": [
+      {
+        "count": 9,
+        "value": "#ffffff"
+      },
+      {
+        "count": 7,
+        "value": "#6f7e94"
+      },
+      {
+        "count": 5,
+        "value": "#f4f7fb"
+      },
+      {
+        "count": 3,
+        "value": "#c3cdda"
+      },
+      {
+        "count": 1,
+        "value": "#3cc86e"
+      },
+      {
+        "count": 1,
+        "value": "#ffd23f"
+      }
+    ]
+  },
+  "forms": [],
+  "headings": [
+    {
+      "level": 2,
+      "text": "Choose a camera"
+    },
+    {
+      "level": 2,
+      "text": "Connect to My KVMS"
+    }
+  ],
+  "health": {
+    "errors": [],
+    "failed_requests": []
+  },
+  "lang": "en",
+  "layouts": [
+    {
+      "blocks": [],
+      "page_h": 900,
+      "page_w": 1920,
+      "type": {
+        "body": 0,
+        "h1": 0,
+        "h2": 0,
+        "h3": 0
+      },
+      "width": 1920
+    }
+  ],
+  "links": [],
+  "meta": {
+    "description": "",
+    "icons": [
+      "http://127.0.0.1:8090/icon.png"
+    ],
+    "og_image": "",
+    "og_title": "",
+    "theme_color": ""
+  },
+  "outline": [
+    {
+      "alt": "",
+      "box": {
+        "h": 40,
+        "w": 40,
+        "x": 28,
+        "y": 16
+      },
+      "color": "#f4f7fb",
+      "depth": 4,
+      "font": "26px 600",
+      "src": "http://127.0.0.1:8090/icon.png",
+      "tag": "img"
+    },
+    {
+      "background": "#222c3a",
+      "box": {
+        "h": 45,
+        "w": 57,
+        "x": 1471,
+        "y": 13
+      },
+      "class": "lay",
+      "color": "#c3cdda",
+      "depth": 4,
+      "font": "16px 400",
+      "tag": "button",
+      "text": "1"
+    },
+    {
+      "background": "#4f7cff",
+      "box": {
+        "h": 45,
+        "w": 57,
+        "x": 1536,
+        "y": 13
+      },
+      "class": "lay on",
+      "color": "#ffffff",
+      "depth": 4,
+      "font": "16px 400",
+      "tag": "button",
+      "text": "4"
+    },
+    {
+      "background": "#222c3a",
+      "box": {
+        "h": 45,
+        "w": 57,
+        "x": 1601,
+        "y": 13
+      },
+      "class": "lay",
+      "color": "#c3cdda",
+      "depth": 4,
+      "font": "16px 400",
+      "tag": "button",
+      "text": "9"
+    },
+    {
+      "background": "#222c3a",
+      "box": {
+        "h": 45,
+        "w": 109,
+        "x": 1675,
+        "y": 13
+      },
+      "color": "#c3cdda",
+      "depth": 3,
+      "font": "16px 400",
+      "id": "btnCams",
+      "tag": "button",
+      "text": "Cameras"
+    },
+    {
+      "alt": "",
+      "box": {
+        "h": 364,
+        "w": 934,
+        "x": 19,
+        "y": 91
+      },
+      "color": "#c3cdda",
+      "depth": 4,
+      "font": "16px 400",
+      "src": "http://127.0.0.1:8090/mjpeg?key=008993&dev=1&ch=0&s=1",
+      "tag": "img"
+    },
+    {
+      "alt": "",
+      "box": {
+        "h": 364,
+        "w": 934,
+        "x": 967,
+        "y": 91
+      },
+      "color": "#c3cdda",
+      "depth": 4,
+      "font": "16px 400",
+      "src": "http://127.0.0.1:8090/mjpeg?key=008993&dev=1&ch=1&s=1",
+      "tag": "img"
+    },
+    {
+      "alt": "",
+      "box": {
+        "h": 364,
+        "w": 934,
+        "x": 19,
+        "y": 469
+      },
+      "color": "#c3cdda",
+      "depth": 4,
+      "font": "16px 400",
+      "src": "http://127.0.0.1:8090/mjpeg?key=008993&dev=1&ch=2&s=1",
+      "tag": "img"
+    },
+    {
+      "alt": "",
+      "box": {
+        "h": 364,
+        "w": 934,
+        "x": 967,
+        "y": 469
+      },
+      "color": "#c3cdda",
+      "depth": 4,
+      "font": "16px 400",
+      "src": "http://127.0.0.1:8090/mjpeg?key=008993&dev=1&ch=3&s=1",
+      "tag": "img"
+    }
+  ],
+  "page": {
+    "h": 900,
+    "w": 1920
+  },
+  "text": "My KVMS 1 4 9 Cameras 17:57 LIVEDevice 33 · CamOutRight LIVEDevice 33 · OutCamRight1 LIVEDevice 33 · Channel3 LIVEDevice 33 · Channel4 Arrows move OK choose camera Green / F full screen Yellow / P camera control 1 4 9 layout Back close",
+  "title": "My KVMS",
+  "unreadable_stylesheets": 0,
+  "url": "http://127.0.0.1:8090/?key=008993",
+  "viewport": {
+    "h": 900,
+    "w": 1920
+  }
+}
